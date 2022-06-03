@@ -1,0 +1,82 @@
+---
+########### devops user ################
+- name: create "devops" user
+  user:
+    name: devops
+    password: "{{ vault_devops_secret | password_hash('sha512') }}"
+    generate_ssh_key: yes
+    append: yes
+    groups: sudo
+    state: present
+    home: /home/devops
+    shell: /bin/bash
+
+- name: Creating authorized keys file
+  file:
+    path: /home/devops/.ssh/authorized_keys
+    state: touch
+    owner: devops
+    group: devops
+    mode: 0600
+
+- name: Add TimeJobs automation public key
+  lineinfile:
+    path: /home/devops/.ssh/authorized_keys
+    state: present
+    insertafter: EOF
+    line: "{{ id_rsa_pub }}"
+    owner: devops
+    group: devops
+    mode: 0600
+
+
+######### Ansible user ################
+- name: create "ansible" user
+  user:
+    name: ansible
+    password: "{{ vault_ansible_secret | password_hash('sha512') }}"
+    generate_ssh_key: yes
+    append: yes
+    groups: sudo
+    state: present
+    home: /home/ansible
+    shell: /bin/bash
+
+- name: Creating authorized keys file
+  file:
+    path: /home/ansible/.ssh/authorized_keys
+    state: touch
+    owner: devops
+    group: devops
+    mode: 0600
+
+- name: passwordless "ansible" user
+  lineinfile:
+    path: /etc/sudoers
+    state: present
+    insertafter: EOF
+    line: 'ansible ALL=(ALL) NOPASSWD: ALL'
+    validate: '/usr/sbin/visudo -cf %s'
+
+- name: Add TimeJobs automation public key
+  lineinfile:
+    path: /home/ansible/.ssh/authorized_keys
+    state: present
+    insertafter: EOF
+    line: "{{ id_automation_pub }}"
+    owner: ansible
+    group: ansible
+    mode: 0600
+
+
+# !!!!!!!!!!!!!!! SSH setup !!!!!!!!!!!!!!!!!!!!!!!
+# No password and no root allowed with SSH ########
+- name: copy sshd_config to /etc/ssh/sshd_config directory
+  copy:
+    src: sshd_config
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart SSH
+
