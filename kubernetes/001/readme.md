@@ -1,6 +1,8 @@
-## Configuración de las VM con Ansible
+## Levantando k3s en un ambiente local con Ansible
 
-Para configurar el software de las VM se utilizará Ansible.
+Este es el código que permite levantar un cluster k3s local con un nodo control plane y multiples nodos worker.
+
+Para configurar el software de las VM se debe ejecutar Ansible en todos los nodos del cluster.
 - Este playbook de Ansible hace lo siguiente:
     - Configura el server SSH para evitar login con password e ingresar con usuario root.
     - Habilita UFW (Uncomplicated Firewall)
