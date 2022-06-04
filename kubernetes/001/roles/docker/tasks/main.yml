@@ -50,22 +50,7 @@
     group: root
     mode: 0644
 
-# !!!!!! UFW setup !!!!!!!!!!!!!!
-- name: Allow everything and enable UFW
-  ufw:
-    state: enabled
 
-- name: Allow all access to ssh port
-  ufw:
-    rule: allow
-    port: 22
-    proto: tcp
-
-- name: Allow all access to wireguard
-  ufw:
-    rule: allow
-    port: 51820
-    proto: udp
 
 
 
