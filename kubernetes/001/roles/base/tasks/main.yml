@@ -8,52 +8,59 @@
     group: root
     mode: 0644
   notify: restart SSH
-
 # Firewall rules for k3s
 # Enable commented ports according to you k3s installation needs
 # https://rancher.com/docs/k3s/latest/en/installation/installation-requirements/#networking
 - name: Enable UFW
   ufw:
     state: enabled
-
 - name: Allow access to ssh port
   ufw:
     rule: allow
     port: 22
     proto: tcp
-
 - name: Kubernetes API server
   ufw:
     rule: allow
-    port: 6443
+    port: "{{ item }}"
     proto: tcp
-
+  with_items:
+    - 443
+    - 6443
 - name: Kubelet metrics
   ufw:
     rule: allow
     port: 10250
     proto: tcp
-
 #- name: Flannel VXLAN
 #  ufw:
 #    rule: allow
 #    port: 8472
 #    proto: udp
-
 #- name: Flannel Wireguard backend
 #  ufw:
 #    rule: allow
 #    port: 51820
 #    proto: udp
-
 #- name: Flannel Wireguard backend with IPv6
 #  ufw:
 #    rule: allow
 #    port: 51821
 #    proto: udp
-
 #- name: HA with embedded etcd
 #  ufw:
 #    rule: allow
 #    port: '2379:2380'
 #    proto: udp
+- name: Adding cluster ips to /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    state: present
+    insertafter: EOF
+    line: "{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - 192.168.54.161 k3smaster
+    - 192.168.54.191 k3sworker01

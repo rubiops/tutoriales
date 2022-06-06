@@ -4,3 +4,6 @@
   roles:
     - base
     - docker
+  vars:
+    docker_users:
+      - 'rubiops'

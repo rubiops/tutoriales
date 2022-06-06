@@ -4,10 +4,10 @@ Este es el código que permite levantar un cluster k3s local con un nodo control
 
 Para configurar el software de las VM se debe ejecutar Ansible en todos los nodos del cluster.
 - Este playbook de Ansible hace lo siguiente:
-    - Configura el server SSH para evitar login con password e ingresar con usuario root.
+    - Configura el server SSH para evitar login con password y con usuario root.
     - Habilita UFW (Uncomplicated Firewall)
     - Habilita puerto 22 (ssh)
-    - Habilita puerto 6443 (k3s API server)
+    - Habilita puerto 443 y 6443 (k3s API server)
     - Habilita puerto 10250 (metricas de Kubelet)
     - Habilita puerto 8472 (Flannel VXLAN, OPCIONAL)
     - Habilita puerto 51820 (Flannel Wireguard backend, OPCIONAL)
