@@ -1,0 +1,7 @@
+---
+- hosts: all
+  become: true
+  roles:
+    - base
+  vars:
+    rubiops_ssh_public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCwKtKiAaaGaHfo4UHdELeKV4Uvw3wmggmo2hj8MzbuK7zTG1f0ekpn5JI/602TUw3wmdmGQqw/s8eqB9VLsjX7aOcfJZCvV9Tpxz+SkpDoWAbgISy+zJMnmMg4MCjW0c7JQmV7N99haVi6d9DZFZVetTTuq8xjrBOghAmewVQ3Kif7imR386u/YaS7u0U8SaXN7OoQ2jeHErEPCPsZCZcCCgCunS2J7Ei9hfTEQC7sGlVd3/EXnfkUN6YhT0GXv/3IsKx5/0QbMPPKDdOuRqV8u/2XDffj0kbnBpkX6eBX5ya8ApgD0kj+DSTPJTWBSnPHYerd0poFtaLa72RPZHI/TSDkYayKYdKxfl7e1NKC4mYjzdnsKkVyznDI3tvJ7LEXwyBsrvzZGuE/zuJJ11uENo6Cp8MSHZlhE1/WFA//2NCL4cc05n4sGi+F+VU3CTa+dArUBRx5sDfeHsMkNLFp6/GPW0scQvwHg/csB0tEYIQ8d0aeJNSK6Lg3DmbZNZc= oscar@rubiops.tech

@@ -1,0 +1,94 @@
+---
+########### create rubiops user ################
+- name: create "rubiops" user
+  user:
+    name: rubiops
+    password: "{{ rubiops_user_password | password_hash('sha512') }}"
+    generate_ssh_key: yes
+    append: yes
+    groups: sudo
+    state: present
+    home: /home/rubiops
+    shell: /bin/bash
+
+- name: Creating authorized keys file
+  file:
+    path: /home/rubiops/.ssh/authorized_keys
+    state: touch
+    owner: rubiops
+    group: rubiops
+    mode: 0600
+
+- name: Add TimeJobs user public key
+  lineinfile:
+    path: /home/rubiops/.ssh/authorized_keys
+    state: present
+    insertafter: EOF
+    line: "{{ rubiops_ssh_public_key }}"
+    owner: rubiops
+    group: rubiops
+    mode: 0600
+
+# No password and no root allowed with SSH ########
+- name: copy sshd_config to /etc/ssh/sshd_config directory
+  copy:
+    src: sshd_config
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart SSH
+
+# Install MOSH shell
+- name: Install aptitude
+  apt:
+    name: aptitude
+    state: latest
+    update_cache: true
+
+- name: Install MOSH shell
+  apt:
+    pkg:
+      - mosh
+    state: latest
+    update_cache: true
+
+- name: Add locale config for Mosh
+  lineinfile:
+    path: /home/rubiops/.bashrc
+    state: present
+    insertafter: EOF
+    line: "{{ item }}"
+    owner: rubiops
+    group: rubiops
+    mode: 0644
+  with_items:
+    - 'export LC_ALL=en_US.UTF-8'
+    - 'export LANG=en_US.UTF-8'
+    - 'export LANGUAGE=en_US.UTF-8'
+
+# Firewall rules
+- name: Enable UFW
+  ufw:
+    state: enabled
+
+- name: Allow access to ssh port
+  ufw:
+    rule: allow
+    port: 22
+    proto: tcp
+
+- name: Allow access to webserver
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  with_items:
+    - 80
+    - 443
+
+- name: Allow access to mosh ports
+  ufw:
+    rule: allow
+    port: '60001:60999'
+    proto: udp

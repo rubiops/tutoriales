@@ -1,9 +1,0 @@
----
-- hosts: all
-  become: true
-  roles:
-    - base
-    - docker
-  vars:
-    docker_users:
-      - 'rubiops'
