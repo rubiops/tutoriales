@@ -8,3 +8,4 @@ Hola a todos, este repositorio contiene código de tutoriales y pequeños proyec
 ## 2. Ubuntu
 1. [Configuración base de Ubuntu con Ansible](./ubuntu/001)
 2. [Configuración de Cloudflare Tunnel (cloudflared) con Ansible](./ubuntu/002)
+3. [Configuración de openvscode-server con Ansible](./ubuntu/003)
