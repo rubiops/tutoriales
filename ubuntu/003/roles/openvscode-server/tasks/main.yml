@@ -1,68 +1,30 @@
 ---
-# Installing cloudflared ########
-- name: Creating gpg key cloudflared directory
-  command: sudo mkdir -p --mode=0755 /usr/share/keyrings
-
-- name: Add cloudflare gpg key
-  shell: curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
-
-- name: Add cloudflare repo to apt repositories
-  shell: echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared buster main' | sudo tee /etc/apt/sources.list.d/cloudflared.list
-
-- name: install cloudflared
-  apt:
-    update_cache: yes
-    name: cloudflared
-
-
-# Configuring cloudflared ########
-- name: Creating .cloudflared directory
+# Installing openvscode-server ########
+- name: Creating openvscode-server directory
   file:
-    path: /root/.cloudflared
+    path: /home/rubiops/openvscode-server
     state: directory
-    owner: root
-    group: root
+    owner: rubiops
+    group: rubiops
 
-- name: copy json file to /root/.cloudflared directory
-  copy:
-    src: 640c3481-9996-4035-a135-daefb0ff03ec.json
-    dest: /root/.cloudflared/640c3481-9996-4035-a135-daefb0ff03ec.json
-    decrypt: yes
-    owner: root
-    group: root
+- name: Download openvscode-server
+  ansible.builtin.get_url:
+    url: https://github.com/gitpod-io/openvscode-server/releases/download/openvscode-server-v1.71.2/openvscode-server-v1.71.2-linux-x64.tar.gz
+    dest: /home/rubiops/openvscode-server/openvscode-server-v1.71.2-linux-x64.tar.gz
+    mode: '0640'
+
+- name: Extracting tar.gz file into /root/openvscode-server
+  ansible.builtin.unarchive:
+    src: /home/rubiops/openvscode-server/openvscode-server-v1.71.2-linux-x64.tar.gz
+    dest: /home/rubiops/openvscode-server/
+    remote_src: yes
+
+- name: Add openvscode-server alias to .bashrc
+  lineinfile:
+    path: /home/rubiops/.bashrc
+    state: present
+    insertafter: EOF
+    line: alias openvscode='/home/rubiops/openvscode-server/openvscode-server-v1.71.2-linux-x64/bin/openvscode-server --port 8080 --without-connection-token &'
+    owner: rubiops
+    group: rubiops
     mode: 0644
-
-- name: copy cert.pem file to /root/.cloudflared directory
-  copy:
-    src: cert.pem
-    dest: /root/.cloudflared/cert.pem
-    decrypt: yes
-    owner: root
-    group: root
-    mode: 0600
-
-- name: copy config.yml file to /root/.cloudflared directory
-  copy:
-    src: config.yml
-    dest: /root/.cloudflared/config.yml
-    owner: root
-    group: root
-    mode: 0644
-
-# Enabling cloudflared as service ####
-- name: Creating /etc/cloudflared directory
-  file:
-    path: /etc/cloudflared
-    state: directory
-    owner: root
-    group: root
-
-- name: Moving config file to /etc/cloudflared
-  command: sudo cp /root/.cloudflared/config.yml /etc/cloudflared/
-
-- name: Installing cloudflared service
-  command: sudo cloudflared --config /etc/cloudflared/config.yml service install
-
-- name: Starting the service
-  command: sudo systemctl start cloudflared
-

@@ -1,3 +1,0 @@
-url: http://localhost:8080
-tunnel: 640c3481-9996-4035-a135-daefb0ff03ec
-credentials-file: /root/.cloudflared/640c3481-9996-4035-a135-daefb0ff03ec.json
