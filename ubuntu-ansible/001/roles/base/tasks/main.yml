@@ -1,4 +1,9 @@
 ---
+########### Setting hostname ################
+- name: Seting a hostname
+  ansible.builtin.hostname:
+    name: rubiops-tech
+
 ########### create rubiops user ################
 - name: create "rubiops" user
   user:
@@ -28,6 +33,12 @@
     owner: rubiops
     group: rubiops
     mode: 0600
+
+# Removing authorized_keys on Oscar user
+- name: Deleting authorized keys file
+  file:
+    path: /home/oscar/.ssh/authorized_keys
+    state: absent
 
 # No password and no root allowed with SSH ########
 - name: copy sshd_config to /etc/ssh/sshd_config directory
@@ -92,3 +103,64 @@
     rule: allow
     port: '60001:60999'
     proto: udp
+
+- name: Allow access to wireguard port
+  ufw:
+    rule: allow
+    port: 51820
+    proto: udp
+
+########### Installing base packages ######
+- name: Installing base dependencies
+  apt:
+    update_cache: yes
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - gnupg
+    - software-properties-common
+    - ca-certificates
+    - curl
+    - apt-transport-https
+    - ansible
+    - wireguard
+
+########## Install Terraform ##########
+- name: Installing Hashicorp gpg key
+  shell: wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+- name: Verifying key fingerprint
+  shell: gpg --no-default-keyring --keyring /usr/share/keyrings/hashicorp-archive-keyring.gpg --fingerprint
+
+- name: Adding Hashicorp reposiroty
+  shell: echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+
+
+- name: Installing Terraform
+  apt:
+    update_cache: yes
+    name: terraform
+
+########## Installing Kubectl #########
+- name: Installing Google Cloud gpg key
+  command: sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+
+- name: Adding Kubernetes apt repository
+  shell: echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+- name: Installing Kubectl
+  apt:
+    update_cache: yes
+    name: kubectl
+
+########## Installing gcloud CLI #########
+- name: Installing gcloud package distribution
+  shell: echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+
+- name: Installing gcloud pgp key
+  shell: curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+
+- name: Installing gcloud CLI
+  apt:
+    update_cache: yes
+    name: google-cloud-cli

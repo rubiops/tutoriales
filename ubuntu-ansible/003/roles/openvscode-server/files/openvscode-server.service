@@ -1,0 +1,14 @@
+[Unit]
+Description=openvscode server service
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+ExecStart=/home/rubiops/openvscode-server/openvscode-server-v1.71.2-linux-x64/bin/openvscode-server --port 8080 --without-connection-token
+Type=simple
+Restart=always
+RestartSec=1
+User=rubiops
+
+[Install]
+WantedBy=multi-user.target

@@ -19,12 +19,15 @@
     dest: /home/rubiops/openvscode-server/
     remote_src: yes
 
-- name: Add openvscode-server alias to .bashrc
-  lineinfile:
-    path: /home/rubiops/.bashrc
-    state: present
-    insertafter: EOF
-    line: alias openvscode='/home/rubiops/openvscode-server/openvscode-server-v1.71.2-linux-x64/bin/openvscode-server --port 8080 --without-connection-token &'
-    owner: rubiops
-    group: rubiops
+- name: Add openvscode-server as service
+  copy:
+    src: openvscode-server.service
+    dest: /etc/systemd/system/openvscode-server.service
+    owner: root
+    group: root
     mode: 0644
+
+- name: Start service openvscode-server, if not running
+  service:
+    name: openvscode-server
+    state: started
