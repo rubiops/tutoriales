@@ -81,6 +81,7 @@
   apt:
     update_cache: yes
     name: google-cloud-cli
+    name: google-cloud-sdk-gke-gcloud-auth-plugin
 
 # Configuring Wireguard
 - name: copying timejobs conf files to /etc/wireguard
@@ -118,5 +119,21 @@
     - docker-ce-cli
     - containerd.io
     - docker-compose-plugin
+
+# Installing Kubectx
+- name: Install kubectx
+  snap:
+    name:
+      - kubectx
+    classic: yes
+
+# Installing Kube-ps1
+- name: copy .kube-ps1.sh to /home/rubiops directory
+  copy:
+    src: .kube-ps1.sh
+    dest: /home/rubiops/.kube-ps1.sh
+    owner: rubiops
+    group: rubiops
+    mode: 0644
 
 

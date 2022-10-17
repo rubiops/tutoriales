@@ -1,8 +1,8 @@
 ---
 # Setting hostname
-- name: Seting a hostname
-  ansible.builtin.hostname:
-    name: rubiops-tech
+#- name: Seting a hostname
+#  ansible.builtin.hostname:
+#    name: rubiops-tech
 
 # create rubiops user
 - name: create "rubiops" user
@@ -50,6 +50,15 @@
     mode: 0644
   notify: restart SSH
 
+# Copying custom bashrc file to /home/rubiops
+- name: copy .bashrc to /home/rubiops directory
+  copy:
+    src: .bashrc
+    dest: /home/rubiops/.bashrc
+    owner: rubiops
+    group: rubiops
+    mode: 0644
+
 # Firewall rules
 - name: Enable UFW
   ufw:
@@ -58,7 +67,7 @@
 - name: Allow access to ssh port
   ufw:
     rule: allow
-    port: 22
+    port: '22'
     proto: tcp
 
 - name: Allow access to webserver
@@ -67,8 +76,8 @@
     port: "{{ item }}"
     proto: tcp
   with_items:
-    - 80
-    - 443
+    - '80'
+    - '443'
 
 - name: Allow access to mosh ports
   ufw:
@@ -79,5 +88,5 @@
 - name: Allow access to wireguard port
   ufw:
     rule: allow
-    port: 51820
+    port: '51820'
     proto: udp
