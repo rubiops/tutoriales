@@ -31,12 +31,12 @@
 
 - name: Add locale config for Mosh
   lineinfile:
-    path: /home/rubiops/.bashrc
+    path: /home/oscar/.bashrc
     state: present
     insertafter: EOF
     line: "{{ item }}"
-    owner: rubiops
-    group: rubiops
+    owner: oscar
+    group: oscar
     mode: 0644
   with_items:
     - 'export LC_ALL=en_US.UTF-8'
@@ -80,8 +80,11 @@
 - name: Installing gcloud CLI
   apt:
     update_cache: yes
-    name: google-cloud-cli
-    name: google-cloud-sdk-gke-gcloud-auth-plugin
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - google-cloud-cli
+    - google-cloud-sdk-gke-gcloud-auth-plugin
 
 # Configuring Wireguard
 - name: copying timejobs conf files to /etc/wireguard
@@ -128,12 +131,12 @@
     classic: yes
 
 # Installing Kube-ps1
-- name: copy .kube-ps1.sh to /home/rubiops directory
+- name: copy .kube-ps1.sh to /home/oscar directory
   copy:
     src: .kube-ps1.sh
-    dest: /home/rubiops/.kube-ps1.sh
-    owner: rubiops
-    group: rubiops
+    dest: /home/oscar/.kube-ps1.sh
+    owner: oscar
+    group: oscar
     mode: 0644
 
 

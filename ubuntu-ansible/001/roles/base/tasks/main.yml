@@ -1,43 +1,43 @@
 ---
 # Setting hostname
-#- name: Seting a hostname
-#  ansible.builtin.hostname:
-#    name: rubiops-tech
+- name: Seting a hostname
+  ansible.builtin.hostname:
+    name: oscar-tech
 
-# create rubiops user
-- name: create "rubiops" user
+# create oscar user
+- name: create "oscar" user
   user:
-    name: rubiops
-    password: "{{ rubiops_user_password | password_hash('sha512') }}"
+    name: oscar
+    password: "{{ oscar_user_password | password_hash('sha512') }}"
     generate_ssh_key: yes
     append: yes
     groups: sudo
     state: present
-    home: /home/rubiops
+    home: /home/oscar
     shell: /bin/bash
 
 - name: Creating authorized keys file
   file:
-    path: /home/rubiops/.ssh/authorized_keys
+    path: /home/oscar/.ssh/authorized_keys
     state: touch
-    owner: rubiops
-    group: rubiops
+    owner: oscar
+    group: oscar
     mode: 0600
 
 - name: Add TimeJobs user public key
   lineinfile:
-    path: /home/rubiops/.ssh/authorized_keys
+    path: /home/oscar/.ssh/authorized_keys
     state: present
     insertafter: EOF
-    line: "{{ rubiops_ssh_public_key }}"
-    owner: rubiops
-    group: rubiops
+    line: "{{ oscar_ssh_public_key }}"
+    owner: oscar
+    group: oscar
     mode: 0600
 
 # Removing authorized_keys on Oscar user
 - name: Deleting authorized keys file
   file:
-    path: /home/oscar/.ssh/authorized_keys
+    path: /home/dummy/.ssh/authorized_keys
     state: absent
 
 # No password and no root allowed with SSH ########
@@ -50,13 +50,13 @@
     mode: 0644
   notify: restart SSH
 
-# Copying custom bashrc file to /home/rubiops
-- name: copy .bashrc to /home/rubiops directory
+# Copying custom bashrc file to /home/oscar
+- name: copy .bashrc to /home/oscar directory
   copy:
     src: .bashrc
-    dest: /home/rubiops/.bashrc
-    owner: rubiops
-    group: rubiops
+    dest: /home/oscar/.bashrc
+    owner: oscar
+    group: oscar
     mode: 0644
 
 # Firewall rules

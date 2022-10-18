@@ -2,21 +2,21 @@
 # Installing openvscode-server ########
 - name: Creating openvscode-server directory
   file:
-    path: /home/rubiops/openvscode-server
+    path: /home/oscar/openvscode-server
     state: directory
-    owner: rubiops
-    group: rubiops
+    owner: oscar
+    group: oscar
 
 - name: Download openvscode-server
   ansible.builtin.get_url:
     url: https://github.com/gitpod-io/openvscode-server/releases/download/openvscode-server-v1.71.2/openvscode-server-v1.71.2-linux-x64.tar.gz
-    dest: /home/rubiops/openvscode-server/openvscode-server-v1.71.2-linux-x64.tar.gz
+    dest: /home/oscar/openvscode-server/openvscode-server-v1.71.2-linux-x64.tar.gz
     mode: '0640'
 
 - name: Extracting tar.gz file into /root/openvscode-server
   ansible.builtin.unarchive:
-    src: /home/rubiops/openvscode-server/openvscode-server-v1.71.2-linux-x64.tar.gz
-    dest: /home/rubiops/openvscode-server/
+    src: /home/oscar/openvscode-server/openvscode-server-v1.71.2-linux-x64.tar.gz
+    dest: /home/oscar/openvscode-server/
     remote_src: yes
 
 - name: Add openvscode-server as service
