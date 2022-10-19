@@ -55,6 +55,7 @@
   copy:
     src: .bashrc
     dest: /home/oscar/.bashrc
+    decrypt: yes
     owner: oscar
     group: oscar
     mode: 0644
