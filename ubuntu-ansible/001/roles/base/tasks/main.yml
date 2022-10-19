@@ -2,7 +2,7 @@
 # Setting hostname
 - name: Seting a hostname
   ansible.builtin.hostname:
-    name: oscar-tech
+    name: rubiops-tech
 
 # create oscar user
 - name: create "oscar" user
@@ -24,7 +24,7 @@
     group: oscar
     mode: 0600
 
-- name: Add TimeJobs user public key
+- name: Add Rubiops user public key
   lineinfile:
     path: /home/oscar/.ssh/authorized_keys
     state: present
