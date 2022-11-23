@@ -1,47 +1,41 @@
 ---
-# Setting hostname
-- name: Seting a hostname
+# Configuración del hostname
+- name: Configuración del hostname
   ansible.builtin.hostname:
-    name: rubiops-tech
+    name: <hostname>
 
-# create oscar user
-- name: create "oscar" user
+# Crea el usuario '<user>'
+- name: Crea el usuario '<user>'
   user:
-    name: oscar
-    password: "{{ oscar_user_password | password_hash('sha512') }}"
+    name: <user>
+    password: "{{ <user>_user_password | password_hash('sha512') }}"
     generate_ssh_key: yes
     append: yes
     groups: sudo
     state: present
-    home: /home/oscar
+    home: /home/<user>
     shell: /bin/bash
 
-- name: Creating authorized keys file
+- name: Crea el archivo authorized_keys
   file:
-    path: /home/oscar/.ssh/authorized_keys
+    path: /home/<user>/.ssh/authorized_keys
     state: touch
-    owner: oscar
-    group: oscar
+    owner: <user>
+    group: <user>
     mode: 0600
 
-- name: Add Rubiops user public key
+- name: Agrega la llave SSH pública al archivo authorized_keys
   lineinfile:
-    path: /home/oscar/.ssh/authorized_keys
+    path: /home/<user>/.ssh/authorized_keys
     state: present
     insertafter: EOF
-    line: "{{ oscar_ssh_public_key }}"
-    owner: oscar
-    group: oscar
+    line: "{{ <user>_ssh_public_key }}"
+    owner: <user>
+    group: <user>
     mode: 0600
 
-# Removing authorized_keys on Oscar user
-- name: Deleting authorized keys file
-  file:
-    path: /home/dummy/.ssh/authorized_keys
-    state: absent
-
-# No password and no root allowed with SSH ########
-- name: copy sshd_config to /etc/ssh/sshd_config directory
+# SSH configurado para no aceptar password ni root
+- name: Copia del archivo sshd_config al direcorio /etc/ssh/sshd_config
   copy:
     src: sshd_config
     dest: /etc/ssh/sshd_config
@@ -50,17 +44,17 @@
     mode: 0644
   notify: restart SSH
 
-# Copying custom bashrc file to /home/oscar
-- name: copy .bashrc to /home/oscar directory
+# Copia del archivo .bashrc al directorio /home/<user>
+- name: Copia de .bashrc al directorio /home/<user>
   copy:
     src: .bashrc
-    dest: /home/oscar/.bashrc
+    dest: /home/<user>/.bashrc
     decrypt: yes
-    owner: oscar
-    group: oscar
+    owner: <user>
+    group: <user>
     mode: 0644
 
-# Firewall rules
+# Configuración del firewall
 - name: Enable UFW
   ufw:
     state: enabled

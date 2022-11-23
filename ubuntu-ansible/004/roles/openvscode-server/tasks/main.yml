@@ -1,25 +1,25 @@
 ---
-# Installing openvscode-server ########
-- name: Creating openvscode-server directory
+# Instalación de openvscode-server
+- name: Creación del directorio openvscode-server
   file:
-    path: /home/oscar/openvscode-server
+    path: /home/<user>/openvscode-server
     state: directory
-    owner: oscar
-    group: oscar
+    owner: <user>
+    group: <user>
 
-- name: Download openvscode-server
+- name: Descargar openvscode-server
   ansible.builtin.get_url:
     url: https://github.com/gitpod-io/openvscode-server/releases/download/openvscode-server-v1.71.2/openvscode-server-v1.71.2-linux-x64.tar.gz
-    dest: /home/oscar/openvscode-server/openvscode-server-v1.71.2-linux-x64.tar.gz
+    dest: /home/<user>/openvscode-server/openvscode-server-v1.71.2-linux-x64.tar.gz
     mode: '0640'
 
-- name: Extracting tar.gz file into /root/openvscode-server
+- name: Extraer archivo tar.gz en el directorio /root/openvscode-server
   ansible.builtin.unarchive:
-    src: /home/oscar/openvscode-server/openvscode-server-v1.71.2-linux-x64.tar.gz
-    dest: /home/oscar/openvscode-server/
+    src: /home/<user>/openvscode-server/openvscode-server-v1.71.2-linux-x64.tar.gz
+    dest: /home/<user>/openvscode-server/
     remote_src: yes
 
-- name: Add openvscode-server as service
+- name: Agregar openvscode-server como servicio
   copy:
     src: openvscode-server.service
     dest: /etc/systemd/system/openvscode-server.service
@@ -27,7 +27,7 @@
     group: root
     mode: 0644
 
-- name: Start service openvscode-server, if not running
+- name: Iniciar el servicio openvscode-server
   service:
     name: openvscode-server
     state: started

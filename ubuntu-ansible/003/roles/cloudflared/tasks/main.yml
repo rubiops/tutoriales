@@ -1,38 +1,41 @@
 ---
-# Installing cloudflared ########
-- name: Creating gpg key cloudflared directory
-  command: sudo mkdir -p --mode=0755 /usr/share/keyrings
+# Instalación de cloudflared 
+- name: Creación de directorio para llave gpg
+  command: mkdir -p --mode=0755 /usr/share/keyrings
+  become: yes
 
-- name: Add cloudflare gpg key
-  shell: curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
+- name: Se agrega llave gpg
+  shell: curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
+  become: yes
 
-- name: Add cloudflare repo to apt repositories
-  shell: echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared buster main' | sudo tee /etc/apt/sources.list.d/cloudflared.list
+- name: Se agrega el repositorio de cloudflare en apt
+  shell: echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared buster main' | tee /etc/apt/sources.list.d/cloudflared.list
+  become: yes
 
-- name: install cloudflared
+- name: instalación de cloudflared
   apt:
     update_cache: yes
     name: cloudflared
 
 
-# Configuring cloudflared ########
-- name: Creating .cloudflared directory
+# Configuración de cloudflared #
+- name: Creación del directorio .cloudflared
   file:
     path: /root/.cloudflared
     state: directory
     owner: root
     group: root
 
-- name: copy json file to /root/.cloudflared directory
+- name: Se copia archivo json en el directorio /root/.cloudflared
   copy:
-    src: 640c3481-9996-4035-a135-daefb0ff03ec.json
-    dest: /root/.cloudflared/640c3481-9996-4035-a135-daefb0ff03ec.json
+    src: 130f9c3a-3bd7-4294-927b-c9f8e44aebc3.json
+    dest: /root/.cloudflared/130f9c3a-3bd7-4294-927b-c9f8e44aebc3.json
     decrypt: yes
     owner: root
     group: root
     mode: 0644
 
-- name: copy cert.pem file to /root/.cloudflared directory
+- name: Copia del certificado cert.pem en el directorio /root/.cloudflared
   copy:
     src: cert.pem
     dest: /root/.cloudflared/cert.pem
@@ -41,7 +44,7 @@
     group: root
     mode: 0600
 
-- name: copy config.yml file to /root/.cloudflared directory
+- name: Copia de config.yml en el directorio /root/.cloudflared
   copy:
     src: config.yml
     dest: /root/.cloudflared/config.yml
@@ -49,20 +52,23 @@
     group: root
     mode: 0644
 
-# Enabling cloudflared as service ####
-- name: Creating /etc/cloudflared directory
+# Habilitación de cloudflared como servicio
+- name: Creación del directorio /etc/cloudflared
   file:
     path: /etc/cloudflared
     state: directory
     owner: root
     group: root
 
-- name: Moving config file to /etc/cloudflared
-  command: sudo cp /root/.cloudflared/config.yml /etc/cloudflared/
+- name: Mover archivo config.yml al directorio /etc/cloudflared
+  command: cp /root/.cloudflared/config.yml /etc/cloudflared/
+  become: yes
 
-- name: Installing cloudflared service
-  command: sudo cloudflared --config /etc/cloudflared/config.yml service install
+- name: Instalación de servicio cloudflared
+  command: cloudflared --config /etc/cloudflared/config.yml service install
+  become: yes
 
-- name: Starting the service
-  command: sudo systemctl start cloudflared
+- name: Iniciar el servicio cloudflared
+  command: systemctl start cloudflared
+  become: yes
 

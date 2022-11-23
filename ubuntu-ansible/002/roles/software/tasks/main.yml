@@ -1,6 +1,6 @@
 ---
-########### Installing base packages ######
-- name: Installing base dependencies
+# Instalación de paquetes base
+- name: Instalación de paquetes base
   apt:
     update_cache: yes
     name: "{{ packages }}"
@@ -15,69 +15,61 @@
     - wireguard
     - resolvconf
 
-# Install MOSH shell
-- name: Install aptitude
+# Instalación de MOSH shell
+- name: Instación de aptitude
   apt:
     name: aptitude
     state: latest
     update_cache: true
 
-- name: Install MOSH shell
+- name: Instalación de MOSH shell
   apt:
     pkg:
       - mosh
     state: latest
     update_cache: true
 
-- name: Add locale config for Mosh
-  lineinfile:
-    path: /home/oscar/.bashrc
-    state: present
-    insertafter: EOF
-    line: "{{ item }}"
-    owner: oscar
-    group: oscar
-    mode: 0644
-  with_items:
-    - 'export LC_ALL=en_US.UTF-8'
-    - 'export LANG=en_US.UTF-8'
-    - 'export LANGUAGE=en_US.UTF-8'
+# Instalación de Terraform
+- name: Instalación de la llave gpg de Hashicorp
+  shell: wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
+  become: yes
 
-# Install Terraform
-- name: Installing Hashicorp gpg key
-  shell: wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
-
-- name: Verifying key fingerprint
+- name: Verificando el fingerprint de la llave
   shell: gpg --no-default-keyring --keyring /usr/share/keyrings/hashicorp-archive-keyring.gpg --fingerprint
 
-- name: Adding Hashicorp repository
-  shell: echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+- name: Se agrega el repositorio de Hashicorp
+  shell: echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list
+  become: yes
 
-- name: Installing Terraform
+- name: Instalación de Terraform
   apt:
     update_cache: yes
     name: terraform
 
-# Installing Kubectl
-- name: Installing Google Cloud gpg key
-  command: sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+# Instalación de Kubectl
+- name: Instalación de la llave gpg de Google Cloud
+  command: curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+  become: yes
 
-- name: Adding Kubernetes apt repository
-  shell: echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+- name: Se agrega el repositorio de Google Kubernetes
+  shell: echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
+  become: yes
 
-- name: Installing Kubectl
+- name: Instalación de Kubectl
   apt:
     update_cache: yes
     name: kubectl
 
-# Installing gcloud CLI
-- name: Installing gcloud package distribution
-  shell: echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+# Instalación de gcloud CLI
+- name: Instalación del package distribution de gcloud
+  shell: echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+  become: yes
 
-- name: Installing gcloud pgp key
-  shell: curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+- name: Instalación de la llave pgp de gcloud
+  shell: curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+  become: yes
 
-- name: Installing gcloud CLI
+- name: Instalación de gcloud CLI
   apt:
     update_cache: yes
     name: "{{ packages }}"
@@ -86,33 +78,26 @@
     - google-cloud-cli
     - google-cloud-sdk-gke-gcloud-auth-plugin
 
-# Configuring Wireguard
-- name: copying timejobs conf files to /etc/wireguard
+# Configuración de Wireguard
+- name: copia del archivo de configuración de dominio a /etc/wireguard
   copy:
-    src: timejobs.conf
-    dest: /etc/wireguard/timejobs.conf
+    src: domain.conf
+    dest: /etc/wireguard/domain.conf
     decrypt: yes
     owner: root
     group: root
     mode: 0644
 
-- name: copying b21 conf files to /etc/wireguard
-  copy:
-    src: b21.conf
-    dest: /etc/wireguard/b21.conf
-    decrypt: yes
-    owner: root
-    group: root
-    mode: 0644
+# Instalación de Docker
+- name: Se agrega llave GPG de Docker
+  shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+  become: yes
 
-# Installing Docker
-- name: Adding Docker GPG key
-  shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+- name: Se agrega repositorio de Docker
+  shell: add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+  become: yes
 
-- name: Adding Docker repository
-  shell: sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
-
-- name: Update apt and install docker-ce
+- name: Se instala Docker y Docker Compose
   apt:
     update_cache: yes
     name: "{{ packages }}"
@@ -123,20 +108,34 @@
     - containerd.io
     - docker-compose-plugin
 
-# Installing Kubectx
-- name: Install kubectx
+- name: Se verifica que el grupo docker existe
+  group:
+    name: docker
+    state: present
+
+- name: Sea grega el usuario <user> al grupo docker
+  user:
+    name: <user>
+    groups: docker
+    append: yes
+
+- name: Se activan cambios en el grupo docker
+  command: newgrp docker
+
+# Instalación de Kubectx
+- name: Instalación de kubectx
   snap:
     name:
       - kubectx
     classic: yes
 
-# Installing Kube-ps1
-- name: copy .kube-ps1.sh to /home/oscar directory
+# Instalación de Kube-ps1
+- name: copia del archivo .kube-ps1.sh al directorio /home/<user>
   copy:
     src: .kube-ps1.sh
-    dest: /home/oscar/.kube-ps1.sh
-    owner: oscar
-    group: oscar
+    dest: /home/<user>/.kube-ps1.sh
+    owner: <user>
+    group: <user>
     mode: 0644
 
 
